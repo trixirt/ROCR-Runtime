@@ -9,18 +9,20 @@
 %bcond_with static
 
 %if %{without debug}
-%if %{without static}
-Name:           %{_name}
+  %if %{without static}
+    %global suf %{nil}
+  %else
+    %global suf -static
+  %endif
 %else
-Name:           %{_name}-static
+  %if %{without static}
+    %global suf -debug
+  %else
+    %global suf -static-debug
+  %endif
 %endif
-%else
-%if %{without static}
-Name:           %{_name}-debug
-%else
-Name:           %{_name}-static-debug
-%endif
-%endif
+
+Name: %{_name}%{suf}
 
 Version:        5.6
 Release:        %{patch_level}.git%{?shortcommit0}%{?dist}
@@ -42,8 +44,6 @@ BuildRequires:  vim-common
 %if %{without debug}
 %global debug_package %{nil}
 %endif
-BuildRequires:  amd-hsakmt-devel
-BuildRequires:  amd-rocm-device-libs-devel
 
 %description
 TBD
@@ -70,6 +70,7 @@ Summary:        TBD
        -DCMAKE_BUILD_TYPE=DEBUG \
 %endif
        -DCMAKE_INSTALL_PREFIX=%{rocm_path}
+
 %cmake_build
 
 %install
